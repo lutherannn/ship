@@ -1,9 +1,7 @@
-#include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <regex>
-#include <stdlib.h>
 
 std::vector<std::string> cmdStack = {};
 std::vector<int> stack = {0};
