@@ -7,7 +7,7 @@ std::vector<std::string> cmdStack = {};
 std::vector<int> stack = {0};
 
 //tokenizes a string into an array by a delimiter. i love reinventing the wheel
-std::vector<std::string> tokenizeString(std::string inp, char delim) {
+std::vector<std::string> tokenizeString(std::string inp, char delim, bool popFirst) {
     std::vector<std::string> r = {};
     std::string t = "";
     for (int i = 0; i < inp.size(); i++) {
@@ -20,7 +20,12 @@ std::vector<std::string> tokenizeString(std::string inp, char delim) {
             r.push_back(t);
         }
     }
-    return r;
+    if (popFirst) {
+        r.erase(r.begin());
+        return r;
+    } else {
+        return r;
+    }
 }
 
 //debug shit
@@ -50,9 +55,6 @@ void readInputFile(std::string fileName) {
     std::ifstream file(fileName);
     std::string l;
     while (std::getline(file, l)) {
-        if (l == "#") {
-            break;
-        }
         cmdStack.push_back(l);
     }
 }
@@ -109,15 +111,24 @@ int processCmd() {
         if (cmdStack[i].rfind("SPEAK PLAINLY", 0) == 0) {
             std::cout << stack[ptr] << std::endl;
         }
-        //adds two elements on the stack together and appends them to the stack
+        //adds two elements on the stack together and appends it to the stack
         if (cmdStack[i].rfind("RECRUIT", 0) == 0) {
-            std::vector<std::string> tokenizedInp = tokenizeString(cmdStack[i], ' ');
-            std::vector<int> addends = {};
-            tokenizedInp.erase(tokenizedInp.begin());
-            for (int i = 0; i < tokenizedInp.size(); i++) {
-                addends.push_back(stoi(tokenizedInp[i]));
-            }
-            stack.push_back(addends[0] + addends[1]);
+            std::vector<std::string> tokenizedInp = tokenizeString(cmdStack[i], ' ', true);
+            stack.push_back(stoi(tokenizedInp[0]) + stoi(tokenizedInp[1]));
+        }
+        //subtracts two elements on the stack and appends it to the stack
+        if (cmdStack[i].rfind("KEELHAUL", 0) == 0) {
+            std::vector<std::string> tokenizedInp = tokenizeString(cmdStack[i], ' ', true);
+            stack.push_back(stoi(tokenizedInp[0]) - stoi(tokenizedInp[1]));
+        }
+        //divides two elements on the stack and appends it to the stack
+        if (cmdStack[i].rfind("DIVVY", 0) == 0) {
+            std::vector<std::string> tokenizedInp = tokenizeString(cmdStack[i], ' ', true);
+            stack.push_back(stoi(tokenizedInp[0]) / stoi(tokenizedInp[1]));
+        }
+        if (cmdStack[i].rfind("RAID", 0) == 0) {
+            std::vector<std::string> tokenizedInp = tokenizeString(cmdStack[i], ' ', true);
+            stack.push_back(stoi(tokenizedInp[0]) * stoi(tokenizedInp[1]));
         }
         //ends the program
         if (cmdStack[i].rfind("MOOR", 0) == 0) {
@@ -131,9 +142,9 @@ int main() {
     readInputFile("input.shp");
     if (processCmd() == 0) {
         std::cout << "program exited code 0" << std::endl;
-            return 0;
+        return 0;
     } else {
         std::cout << "program exited code 1" << std::endl;
-            return 1;
+        return 1;
     }
 }
