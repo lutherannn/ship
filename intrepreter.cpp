@@ -33,21 +33,6 @@ void outputStack(){
     for (int i = 0; i < stack.size(); i++) {
         std::cout << stack[i] << ' ';
     }
-    std::cout << std::endl;
-}
-
-//technically idk if i really need this since i can tokenize it
-//plus i know which elements will be where but i'll keep it to avoid refactoring for now
-int getSingleNumber(std::string inp) {
-    int n;
-    std::regex regex(R"(\d+)");
-    std::smatch match;
-
-    while (std::regex_search(inp, match, regex)) {
-        n = std::stoi(match.str());
-        inp = match.suffix();
-    }
-    return n;
 }
 
 //reads the input file
@@ -63,7 +48,7 @@ void readInputFile(std::string fileName) {
 int processCmd() {
     //where the pointer is on the stack, default 0
     int ptr = 0;
-    //loops over each line in the input file stack we created
+    //loops over each element in the input file stack we created
     for (int i = 0; i < cmdStack.size(); i++) {
         //program entry point, sets the pointer to 0 if it isn't already
         if (cmdStack[i].rfind("BOARD", 0) == 0) {
@@ -84,18 +69,23 @@ int processCmd() {
         if (cmdStack[i].rfind("SAIL HOME", 0) == 0) {
             ptr = 0;
         }
+        //displays the current position on the stack
+        if (cmdStack[i].rfind("CHART", 0) == 0) {
+            std::cout << ptr << std::endl;
+        }
         //loads a value into the current position on the stack
         if (cmdStack[i].rfind("LOAD", 0) == 0) {
-            stack[ptr] = getSingleNumber(cmdStack[i]);
+            stack[ptr] = stoi(tokenizeString(cmdStack[i], ' ', true)[0]);
         }
         //will remove a value once i need to implement it
         if (cmdStack[i].rfind("UNLOAD", 0) == 0) {
-
+            stack.erase(stack.begin() + ptr);
         }
         //loads a value into the stack and then prints it to stdout, will also be removed after
         if (cmdStack[i].rfind("OVERLOAD", 0) == 0) {
-            stack[ptr] = getSingleNumber(cmdStack[i]);
+            stack[ptr] = stoi(tokenizeString(cmdStack[i], ' ', true)[0]);
             std::cout << char(stack[ptr]);
+            stack.erase(stack.begin() + ptr);
         }
         //prints the char of the ascii number at the current position of the stack to stdout with no newline
         if (cmdStack[i].rfind("CALL NO ANSWER", 0) == 0) {
@@ -138,7 +128,13 @@ int processCmd() {
     return 1;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    std::cout << argv[1] << std::endl;
+    if (argv[1] == std::string("-i")) {
+        //TODO: run interactively
+    }
+    return 0;
+    /*
     readInputFile("input.shp");
     if (processCmd() == 0) {
         std::cout << "program exited code 0" << std::endl;
@@ -147,4 +143,5 @@ int main() {
         std::cout << "program exited code 1" << std::endl;
         return 1;
     }
+    */
 }
